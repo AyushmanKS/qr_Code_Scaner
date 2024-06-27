@@ -17,16 +17,6 @@ class _GenerateCodePageState extends State<GenerateCodePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Generate Code'),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ScanCodePage()));
-              },
-              icon: const Icon(Icons.qr_code))
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
