@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qr_code_scanner/pages/generate_code.dart';
 
 class ScanCodePage extends StatefulWidget {
   const ScanCodePage({super.key});
@@ -12,8 +13,16 @@ class _ScanCodePageState extends State<ScanCodePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Scan Code'),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.scanner))
+          IconButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const GenerateCodePage()));
+              },
+              icon: const Icon(Icons.qr_code_scanner))
         ],
       ),
     );
