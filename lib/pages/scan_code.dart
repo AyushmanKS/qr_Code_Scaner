@@ -1,9 +1,7 @@
 import 'dart:developer';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qr_code_scanner/pages/generate_code.dart';
 
 class ScanCodePage extends StatefulWidget {
   const ScanCodePage({super.key});
@@ -28,6 +26,9 @@ class _ScanCodePageState extends State<ScanCodePage> {
           log('---------$capture---------');
           List<Barcode> barcodes = capture.barcodes;
           final Uint8List? image = capture.image;
+          String barcodeValue = barcodes.isNotEmpty
+              ? barcodes.first.rawValue ?? "No code found!"
+              : "No code found!";
 
           for (final barcode in barcodes) {
             log('-------------Barcode found!: ${barcode.rawValue}');
@@ -37,9 +38,36 @@ class _ScanCodePageState extends State<ScanCodePage> {
               context: context,
               builder: (context) {
                 return AlertDialog(
-                  title: Text(barcodes.first.rawValue ?? "No code found!"),
-                  content: Image(
-                    image: MemoryImage(image),
+                  title: Text(
+                    barcodeValue,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image(
+                        image: MemoryImage(image),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              Clipboard.setData(
+                                  ClipboardData(text: barcodeValue));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Copied to clipboard')),
+                              );
+                            },
+                            icon: const Icon(Icons.copy),
+                          ),
+                          IconButton(
+                            onPressed: () async {},
+                            icon: const Icon(Icons.share),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 );
               },
