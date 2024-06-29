@@ -1,7 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ScanCodePage extends StatefulWidget {
   const ScanCodePage({super.key});
@@ -22,7 +25,7 @@ class _ScanCodePageState extends State<ScanCodePage> {
           detectionSpeed: DetectionSpeed.noDuplicates,
           returnImage: true,
         ),
-        onDetect: (capture) {
+        onDetect: (capture) async {
           log('---------$capture---------');
           List<Barcode> barcodes = capture.barcodes;
           final Uint8List? image = capture.image;
@@ -33,7 +36,13 @@ class _ScanCodePageState extends State<ScanCodePage> {
           for (final barcode in barcodes) {
             log('-------------Barcode found!: ${barcode.rawValue}');
           }
+
           if (image != null) {
+            final Directory tempDir = await getTemporaryDirectory();
+            final String tempPath = tempDir.path;
+            final File file = File('$tempPath/scanned_image.png');
+            await file.writeAsBytes(image);
+
             showDialog(
               context: context,
               builder: (context) {
@@ -56,13 +65,17 @@ class _ScanCodePageState extends State<ScanCodePage> {
                               Clipboard.setData(
                                   ClipboardData(text: barcodeValue));
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Copied to clipboard')),
+                                const SnackBar(
+                                    content: Text('Copied to clipboard')),
                               );
                             },
                             icon: const Icon(Icons.copy),
                           ),
                           IconButton(
-                            onPressed: () async {},
+                            onPressed: () async {
+                              await Share.shareXFiles([XFile(file.path)],
+                                  text: barcodeValue);
+                            },
                             icon: const Icon(Icons.share),
                           ),
                         ],
